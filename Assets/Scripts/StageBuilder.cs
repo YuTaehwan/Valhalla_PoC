@@ -19,7 +19,7 @@ public class StageBuilder : MonoBehaviour
 	#region PrivateMethod
 	public void Build() {
 		if (_stageSetting == null) {
-			Debug.LogError("StageSetting is null");
+			GameManager.Log.Log("StageSetting is null", LogManager.LogType.ERROR);
 			return;
 		}
 	}
