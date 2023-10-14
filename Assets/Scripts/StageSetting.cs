@@ -20,6 +20,9 @@ public class StageSettingData {
 	public float floorHeight;
 	public float floorDepth;
 
+	public int floorUnitWidth;
+	public int floorUnitHeight;
+
 	public GameObject wallPrefab;
 	public float wallWidth;
 	public float wallHeight;
