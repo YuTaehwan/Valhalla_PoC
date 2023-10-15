@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78eb9c16274143f44b3cbc855409afe0, type: 3}
+  m_Name: TomatoInBowl
+  m_EditorClassIdentifier: 
+  foodName: TomatoInBowl
+  sprite: {fileID: 0}
+  prefab: {fileID: 6788608700646837868, guid: 5381286391ec112439015fee001046be, type: 3}
+  chopped: {fileID: 0}
+  inBowl: {fileID: 0}

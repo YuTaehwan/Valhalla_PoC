@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78eb9c16274143f44b3cbc855409afe0, type: 3}
+  m_Name: Cabbage
+  m_EditorClassIdentifier: 
+  foodName: Cabbage
+  sprite: {fileID: 0}
+  prefab: {fileID: 7026048635871536653, guid: 2f27492015e1fbb4b84524a5f203defb, type: 3}
+  chopped: {fileID: 11400000, guid: 596b7846517538e45b4eb303a2468b4a, type: 2}
+  inBowl: {fileID: 11400000, guid: 8ef4ce3067af6b446a808b45aa3224b8, type: 2}

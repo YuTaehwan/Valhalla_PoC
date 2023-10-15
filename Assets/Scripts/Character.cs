@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 namespace TH.Core {
 
@@ -21,6 +22,8 @@ public class Character : MonoBehaviour
 	private float _targetAngle;
 
 	private StageObject _target = null;
+	private Food _targetFood = null;
+	private GameObject _targetFoodObject = null;
 	#endregion
 
 	#region PublicMethod
@@ -36,14 +39,30 @@ public class Character : MonoBehaviour
         _horizontalInput = Input.GetAxis("Horizontal");
         _verticalInput = Input.GetAxis("Vertical");
 
-		SetTargetPos();
+		CheckTargetPos();
 
 		if (Input.GetKeyDown(KeyCode.Space)) {
-			if (_target == null) {
+			if (_target == null && _targetFood == null) {
 				HoldTarget();
 			} else {
-				PlaceTarget();
+				if (_target != null) {
+					PlaceTarget();
+				}
 			}
+		}
+
+		if (Input.GetKeyDown(KeyCode.F)) {
+			if (_targetFood == null && _target == null) {
+				GetFood();
+			} else {
+				if (_targetFood != null) {
+					ReleaseFood();
+				}
+			}
+		}
+
+		if (Input.GetKeyDown(KeyCode.R)) {
+			RotateTarget();
 		}
 
 		if (_target != null) {
@@ -80,73 +99,133 @@ public class Character : MonoBehaviour
 		}
 	}
 
-	private void SetTargetPos() {
+	private Vector2Int GetTarget() {
 		int currentX = Mathf.FloorToInt(transform.position.x / 2);
 		int currentY = Mathf.FloorToInt(transform.position.z / 2);
 
 		if (_targetAngle == 0f) {
-			GameManager.Stage.CheckTarget(currentX, currentY + 1);
+			return new Vector2Int(currentX, currentY + 1);
 		} else if (_targetAngle == 90f) {
-			GameManager.Stage.CheckTarget(currentX + 1, currentY);
+			return new Vector2Int(currentX + 1, currentY);
 		} else if (_targetAngle == 180f) {
-			GameManager.Stage.CheckTarget(currentX, currentY - 1);
+			return new Vector2Int(currentX, currentY - 1);
 		} else if (_targetAngle == 270f) {
-			GameManager.Stage.CheckTarget(currentX - 1, currentY);
+			return new Vector2Int(currentX - 1, currentY);
 		}
+
+		return new Vector2Int(currentX, currentY + 1);
+	}
+
+	private void CheckTargetPos() {
+		var targetPos = GetTarget();
+		GameManager.Stage.CheckTarget(targetPos.x, targetPos.y);
 	}
 
 	private void HoldTarget() {
-		int currentX = Mathf.FloorToInt(transform.position.x / 2);
-		int currentY = Mathf.FloorToInt(transform.position.z / 2);
+		var targetPos = GetTarget();
 
-		if (_targetAngle == 0f) {
-			if (GameManager.Stage.GetObject(currentX, currentY + 1) != null) {
-				_target = GameManager.Stage.RemoveObject(currentX, currentY + 1);
-				_target.Hold();
-			}
-		} else if (_targetAngle == 90f) {
-			if (GameManager.Stage.GetObject(currentX + 1, currentY) != null) {
-				_target = GameManager.Stage.RemoveObject(currentX + 1, currentY);
-				_target.Hold();
-			}
-		} else if (_targetAngle == 180f) {
-			if (GameManager.Stage.GetObject(currentX, currentY - 1) != null) {
-				_target = GameManager.Stage.RemoveObject(currentX, currentY - 1);
-				_target.Hold();
-			}
-		} else if (_targetAngle == 270f) {
-			if (GameManager.Stage.GetObject(currentX - 1, currentY) != null) {
-				_target = GameManager.Stage.RemoveObject(currentX - 1, currentY);
-				_target.Hold();
-			}
+		if (GameManager.Stage.GetObject(targetPos.x, targetPos.y) == null) {
+			return;
 		}
+
+		_target = GameManager.Stage.RemoveObject(targetPos.x, targetPos.y);
+		_target.Hold();
 	}
 
 	private void PlaceTarget() {
-		int currentX = Mathf.FloorToInt(transform.position.x / 2);
-		int currentY = Mathf.FloorToInt(transform.position.z / 2);
+		var targetPos = GetTarget();
 
-		if (_targetAngle == 0f) {
-			if (GameManager.Stage.IsPlaceAvailable(currentX, currentY + 1)) {
-				GameManager.Stage.PlaceObject(_target, currentX, currentY + 1);
-				_target = null;
-			}
-		} else if (_targetAngle == 90f) {
-			if (GameManager.Stage.IsPlaceAvailable(currentX + 1, currentY)) {
-				GameManager.Stage.PlaceObject(_target, currentX + 1, currentY);
-				_target = null;
-			}
-		} else if (_targetAngle == 180f) {
-			if (GameManager.Stage.IsPlaceAvailable(currentX, currentY - 1)) {
-				GameManager.Stage.PlaceObject(_target, currentX, currentY - 1);
-				_target = null;
-			}
-		} else if (_targetAngle == 270f) {
-			if (GameManager.Stage.IsPlaceAvailable(currentX - 1, currentY)) {
-				GameManager.Stage.PlaceObject(_target, currentX - 1, currentY);
-				_target = null;
-			}
+		if (!GameManager.Stage.IsPlaceAvailable(targetPos.x, targetPos.y)) {
+			return;
 		}
+
+		GameManager.Stage.PlaceObject(_target, targetPos.x, targetPos.y);
+		_target = null;
+	}
+
+	private void RotateTarget() {
+		var targetPos = GetTarget();
+
+		if (GameManager.Stage.GetObject(targetPos.x, targetPos.y) == null) {
+			return;
+		}
+
+		GameManager.Stage.RotateObject(targetPos.x, targetPos.y);
+	}
+
+	private void GetFood() {
+		if (_targetFood != null) {
+			return;
+		}
+
+		if (_target != null) {
+			return;
+		}
+
+		var targetPos = GetTarget();
+
+		if (GameManager.Stage.GetObject(targetPos.x, targetPos.y) == null) {
+			return;
+		}
+
+		var stageObject = GameManager.Stage.GetObject(targetPos.x, targetPos.y);
+		if (stageObject is not CookingBox) {
+			return;
+		}
+
+		var cookingBox = stageObject as CookingBox;
+		_targetFood = cookingBox.ExtractFood();
+
+		if (_targetFood == null) {
+			return;
+		}
+
+		InstantiateFoodObject();
+	}
+
+	private void ReleaseFood() {
+		if (_targetFood == null) {
+			return;
+		}
+
+		if (_target != null) {
+			return;
+		}
+
+		var targetPos = GetTarget();
+
+		if (GameManager.Stage.GetObject(targetPos.x, targetPos.y) == null) {
+			return;
+		}
+
+		var stageObject = GameManager.Stage.GetObject(targetPos.x, targetPos.y);
+		if (stageObject is not CookingBox) {
+			return;
+		}
+
+		var cookingBox = stageObject as CookingBox;
+		cookingBox.RecieveFood(_targetFood);
+		DestroyFoodObject();
+		_targetFood = null;
+	}
+
+	private void InstantiateFoodObject() {
+		if (_targetFoodObject != null) {
+			DestroyFoodObject();
+		}
+
+		_targetFoodObject = Instantiate(_targetFood.prefab, transform.position + new Vector3(0, 3, 0), Quaternion.identity);
+		_targetFoodObject.transform.SetParent(transform);
+		_targetFoodObject.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+	}
+
+	private void DestroyFoodObject() {
+		if (_targetFoodObject == null) {
+			return;
+		}
+
+		Destroy(_targetFoodObject);
+		_targetFoodObject = null;
 	}
 	#endregion
 }

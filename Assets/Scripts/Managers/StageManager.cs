@@ -74,6 +74,22 @@ public class StageManager : IManager {
 		return _stageObjectList[realX][realY];
 	}
 
+	public void RotateObject(int x, int y) {
+		int realX = x + _floorWidth / 2;
+		int realY = y + _floorHeight / 2;
+
+		if (realX < 0 || realX >= _floorWidth || realY < 0 || realY >= _floorHeight) {
+			return;
+		}
+
+		var stageObject = _stageObjectList[realX][realY];
+		if (stageObject == null) {
+			return;
+		}
+
+		stageObject.Rotate();
+	}
+
 	public void CheckTarget(int x, int y) {
 		int realX = x + _floorWidth / 2;
 		int realY = y + _floorHeight / 2;
