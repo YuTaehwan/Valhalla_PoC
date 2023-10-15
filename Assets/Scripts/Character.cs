@@ -47,7 +47,7 @@ public class Character : MonoBehaviour
 		}
 
 		if (_target != null) {
-			_target.transform.position = transform.position + new Vector3(0, 2, 0);
+			_target.transform.position = transform.position + new Vector3(0, 3, 0);
 		}
 	}
 
